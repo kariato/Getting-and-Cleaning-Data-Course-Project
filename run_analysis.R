@@ -53,15 +53,17 @@ activity_labels <- setnames(activity_labels,"V1","Activity")
 requiredColumns <- grep(".*mean.*|.*std.*",headerNames,value=TRUE)
 x_subset <- subset(x_whole,select = requiredColumns)
 #
-#
-#final_dataset <- cbind(subject_whole$V1,y_whole$V2,x_subset) %>% 
-#  setnames(c("V1","V2"),c("Subject","Activity")) 
+#group data by subject and activity 
 summary_dataset <- aggregate(x_subset,by=list(Subject=subject_whole$V1,Activity=y_whole$V1),mean)
+#apply name of activity 
 summary_dataset <- merge(summary_dataset,activity_labels,by="Activity",all=TRUE)
+#reshape data for good tidy format
 summary_dataset$Activity <- summary_dataset$V2
 summary_dataset$V2 <- NULL
 summary_dataset <- summary_dataset[,c(2, 1, 3:length(names(summary_dataset)))]
 summary_dataset <- arrange(summary_dataset,Subject,Activity)
+#write data to file to save results
 write.table(summary_dataset,"tidy.txt", row.names=FALSE, quote = FALSE)
+#read data back to confirm saved OK and is in valid format
 test <- fread("tidy.txt")
 
